@@ -1,1 +1,1 @@
-# attitydlig
+# attitydlig - attitydanalys av svenska produktomdömen
