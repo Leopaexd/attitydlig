@@ -8,11 +8,11 @@ import time
 
 class Dictionary(object):
 
-    def __init__(self, post_array):
+    def __init__(self, preprocessed_data):
         self.dictionary = dict()
         start = time.time()
         print("Indexing words")
-        for post in post_array:
+        for post in preprocessed_data:
             for word in post:
                 if word not in self.dictionary:
                     self.dictionary[word] = len(self.dictionary)
