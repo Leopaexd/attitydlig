@@ -3,7 +3,7 @@
 # Huvudfil
 
 import classifier
-import dictionary
+import dictionary as dict
 import extractor
 import preprocessor
 import vectorizer
@@ -11,7 +11,8 @@ import vectorizer
 def main():
     extracted_data = extractor.extract('inputfile')
     preprocessed_data = preprocessor.preprocess(extracted_data)
-    vectorized_data = vectorizer.vectorize_data(preprocessed_data)
+    dictionary = dict.Dictionary(preprocessed_data)
+    vectorized_data = vectorizer.vectorize_data(preprocessed_data,dictionary)
     pass
 
 main()
