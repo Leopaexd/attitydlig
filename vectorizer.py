@@ -10,11 +10,14 @@ import time
 def vectorize_review(review,dictionary,length):
     vector = []
     for word in review:
-        vector.append(dictionary.dictionary[word])
+        if len(vector) < length:
+            vector.append(dictionary.dictionary[word])
     # Add padding until vector is of specified length
     while len(vector) < length:
         vector.append(0)
-    return np.asarray(vector)
+    array = np.asarray(vector)
+    print(array.shape)
+    return array
 
 # Vectorize a list of reviews, and return a numpy 2D matrix of the stacked vectors
 def vectorize_data(preprocessed_data,dictionary, length):
@@ -25,4 +28,7 @@ def vectorize_data(preprocessed_data,dictionary, length):
         vectorized_data.append(vectorize_review(review,dictionary, length))
     time_elapsed = time.time() - start
     print("Vectorization completed in ", ("%.2f" % time_elapsed), "seconds")
-    return np.asarray(vectorized_data)
+
+    matrix = np.vstack(vectorized_data)
+    print(matrix.shape)
+    return matrix

@@ -21,5 +21,6 @@ def preprocess(unprocessed_reviews):
         preprocessed_reviews.append(tokenized_review)
         number_of_reviews += 1
     time_elapsed = time.time() - start
-    print("Preprocessed " + str(number_of_reviews) + "reviews in ", ("%.2f" % time_elapsed), "seconds")
+
+    print("Preprocessed " + str(number_of_reviews) + " reviews in ", ("%.2f" % time_elapsed), "seconds")
     return preprocessed_reviews

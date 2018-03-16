@@ -19,7 +19,9 @@ def main():
        # print(line)
 
     preprocessed_reviews = preprocessor.preprocess(extracted_reviews)
-    #dictionary = dict.Dictionary(preprocessed_reviews)
-    #vectorized_data = vectorizer.vectorize_data(preprocessed_reviews,dictionary,300) # 300 word maximum length
+    dictionary = dict.Dictionary(preprocessed_reviews)
+    vectorized_data = vectorizer.vectorize_data(preprocessed_reviews,dictionary,300) # 300 word maximum length
+    tpot = classifier.Classifier()
+    tpot.fit(vectorized_data,polarities)
 
 main()
