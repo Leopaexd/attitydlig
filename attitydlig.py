@@ -9,14 +9,17 @@ import preprocessor
 import vectorizer
 
 def main():
-    directory = 'C:\\Users\\olive\\Desktop\\Datamängder för uppsats\\ESCW 2016'
+    directory = 'C:\\Users\\olive\\Desktop\\Datamängder för uppsats\\ESCW 2016\\Software'
 
-    extracted_data = extractor.extract(directory)
+    extracted_data = extractor.xml_extract(directory)
+    extracted_reviews = extracted_data[0]
+    polarities = extracted_data[1]
 
-    for line in extracted_data:
-        print(line)
-    preprocessed_data = preprocessor.preprocess(extracted_data)
-    dictionary = dict.Dictionary(preprocessed_data)
-    vectorized_data = vectorizer.vectorize_data(preprocessed_data,dictionary,300) # 300 word maximum length
+    #for line in extracted_reviews:
+       # print(line)
+
+    preprocessed_reviews = preprocessor.preprocess(extracted_reviews)
+    #dictionary = dict.Dictionary(preprocessed_reviews)
+    #vectorized_data = vectorizer.vectorize_data(preprocessed_reviews,dictionary,300) # 300 word maximum length
 
 main()
