@@ -17,7 +17,7 @@ class Dictionary(object):
                 if word not in self.dictionary:
                     self.dictionary[word] = len(self.dictionary)
         time_elapsed = time.time() - start
-        print("Indexing completed in ", ("%.2f" % time_elapsed), "seconds")
+        print("Indexed " + len(self.dictionary) + " words in ", ("%.2f" % time_elapsed), "seconds")
 
     def clear(self):
         self.dictionary.clear()
