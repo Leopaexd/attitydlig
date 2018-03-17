@@ -30,7 +30,10 @@ def xml_extract(directory):
                  polarity = sentence.find('polarity').text
                  text = sentence.find('text').text
                  reviews.append(text)
-                 polarities.append(polarity)
+                 if polarity.upper() == 'POSITIVE':
+                     polarities.append(1)
+                 else:
+                     polarities.append(0)
             except ET.ParseError:
                 pass
 

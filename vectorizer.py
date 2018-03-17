@@ -16,7 +16,6 @@ def vectorize_review(review,dictionary,length):
     while len(vector) < length:
         vector.append(0)
     array = np.asarray(vector)
-    print(array.shape)
     return array
 
 # Vectorize a list of reviews, and return a numpy 2D matrix of the stacked vectors
@@ -29,8 +28,14 @@ def vectorize_data(preprocessed_data,dictionary, length):
     time_elapsed = time.time() - start
     print("Vectorization completed in ", ("%.2f" % time_elapsed), "seconds")
 
-    x_training_and_testing = np.split(vectorized_data, len(vectorized_data) * 0.9)
+    x_training_and_testing = np.array_split(np.asarray(vectorized_data), [0,int((len(vectorized_data) * 0.9))])
+    print(len(x_training_and_testing))
 
-    x_training = np.vstack(x_training_and_testing[0])
-    x_testing = np.vstack(x_training_and_testing[1])
+   # x_training = np.vstack(x_training_and_testing[0])
+   # x_testing = np.vstack(x_training_and_testing[1])
+
+    x_training = x_training_and_testing[0] # 2st
+    x_testing = x_training_and_testing[1] # 2 st
+
+
     return [x_training,x_testing]
