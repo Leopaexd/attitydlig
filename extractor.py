@@ -34,4 +34,4 @@ def xml_extract(directory):
             except ET.ParseError:
                 pass
 
-    return [reviews, polarities]
+    return [reviews,polarities]

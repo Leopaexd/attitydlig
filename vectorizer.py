@@ -29,6 +29,8 @@ def vectorize_data(preprocessed_data,dictionary, length):
     time_elapsed = time.time() - start
     print("Vectorization completed in ", ("%.2f" % time_elapsed), "seconds")
 
-    matrix = np.vstack(vectorized_data)
-    print(matrix.shape)
-    return matrix
+    x_training_and_testing = np.split(vectorized_data, len(vectorized_data) * 0.9)
+
+    x_training = np.vstack(x_training_and_testing[0])
+    x_testing = np.vstack(x_training_and_testing[1])
+    return [x_training,x_testing]

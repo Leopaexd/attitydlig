@@ -7,6 +7,7 @@ import dictionary as dict
 import extractor
 import preprocessor
 import vectorizer
+import numpy as np
 
 def main():
     directory = 'C:\\Users\\olive\\Desktop\\Datamängder för uppsats\\ESCW 2016\\Software'
@@ -21,7 +22,12 @@ def main():
     preprocessed_reviews = preprocessor.preprocess(extracted_reviews)
     dictionary = dict.Dictionary(preprocessed_reviews)
     vectorized_data = vectorizer.vectorize_data(preprocessed_reviews,dictionary,300) # 300 word maximum length
+    x_training = vectorized_data[0]
+    x_testing = vectorized_data[1]
+    y_training_and_testing = np.split(polarities,len(polarities)*0.9)
+    y_training =  y_training_and_testing[0]
+    y_testing = y_training_and_testing[1]
     tpot = classifier.Classifier()
-    tpot.fit(vectorized_data,polarities)
+    tpot.fit(x_training,y_training)
 
 main()

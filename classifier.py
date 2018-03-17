@@ -3,13 +3,22 @@
 # Klassificering
 
 
-from tpot import TPOTClassifier
+from keras.models import Sequential
+from keras.layers import Dense
+
 
 class Classifier:
     def __init__(self):
-        self.tpot = TPOTClassifier(generations=20, population_size=10, verbosity=3, max_eval_time_mins=1,
-                                   periodic_checkpoint_folder='my_checkpoints')
+        self.model = Sequential()
+        self.model.add(Dense(units=64, activation='relu',input_dim=300)
+        self.model.add(Dense(units=10, activation='softmax'))
+        self.model.compile(loss='categorical_crossentropy',
+                           optimizer='sgd',
+                           metrics=['accuracy'])
 
-    def fit(self,reviews,polarities):
-        self.tpot.fit(reviews, polarities)
-        self.tpot.export('tpot_exported_pipeline.py')
+    def fit(self, x_training, y_training):
+        self.model.fit(x_training, y_training, epochs=5, batch_size=32, verbose=3)
+
+    def evaluate(self,x_testing,y_testing):
+        loss_and_metrics = self.model.evaluate(x_testing,y_testing,batch_size=128,verbose=1)
+        print(loss_and_metrics)
