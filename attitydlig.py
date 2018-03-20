@@ -8,9 +8,14 @@ import extractor
 import preprocessor
 import vectorizer
 import numpy as np
+import gensim
 from keras.utils.np_utils import to_categorical
 
+
 def main():
+    word_vectors = gensim.models.KeyedVectors.load_word2vec_format('C:\\Users\\olive\\Desktop\\'
+                                                            'GoogleNews-vectors-negative300\\'
+                                                            'GoogleNews-vectors-negative300.bin', binary=True)
     directory = 'C:\\Users\\olive\\Desktop\\Datamängder för uppsats\\ESCW 2016\\Software'
 
     extracted_data = extractor.xml_extract(directory)
@@ -21,9 +26,9 @@ def main():
        # print(line)
 
     preprocessed_reviews = preprocessor.preprocess(extracted_reviews)
-    dictionary = dict.Dictionary(preprocessed_reviews)
+    # dictionary = dict.Dictionary(preprocessed_reviews)
 
-    vectorized_data = vectorizer.vectorize_data(preprocessed_reviews,dictionary,300) # 300 word maximum length
+    vectorized_data = vectorizer.vectorize_data(preprocessed_reviews,word_vectors,300) # 300 word maximum length
     x_training = vectorized_data[0]
     x_testing = vectorized_data[1]
 

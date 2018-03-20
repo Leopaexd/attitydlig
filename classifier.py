@@ -8,7 +8,6 @@ from keras.layers import Dense
 import numpy as np
 import time
 
-
 class Classifier:
     def __init__(self):
         self.model = Sequential()

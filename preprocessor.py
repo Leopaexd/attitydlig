@@ -9,7 +9,7 @@ import time
 # Take a list of unprocessed reviews and return a list of preprocessed reviews.
 def preprocess(unprocessed_reviews):
     start = time.time()
-    stemmer = SnowballStemmer('english')
+    #stemmer = SnowballStemmer('english')
     preprocessed_reviews = []
     print ("Preprocessing...")
     number_of_reviews = 0
@@ -17,7 +17,8 @@ def preprocess(unprocessed_reviews):
         tokenized_review = []
         for word in word_tokenize(review):
             if word not in ["." , ","]:
-                tokenized_review.append(stemmer.stem(word).upper())
+                tokenized_review.append(word)
+                #tokenized_review.append(stemmer.stem(word).upper())
         preprocessed_reviews.append(tokenized_review)
         number_of_reviews += 1
     time_elapsed = time.time() - start
