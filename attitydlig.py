@@ -9,14 +9,12 @@ import preprocessor
 import vectorizer
 
 def main():
-    directory = 'C:\\Users\\olive\\Desktop\\Datamängder för uppsats\\ESCW 2016\\Software'
+    directory = 'C:\\Users\\olive\\Desktop\\Datamängder för uppsats\\Prisjakt\\Utvärderingsdata'
 
-    extracted_data = extractor.xml_extract(directory)
+    extracted_data = extractor.json_extract(directory)
     extracted_reviews = extracted_data[0]
     polarities = extracted_data[1]
 
-    #for line in extracted_reviews:
-       # print(line)
 
     preprocessed_reviews = preprocessor.preprocess(extracted_reviews)
     dictionary = dict.Dictionary(preprocessed_reviews)
