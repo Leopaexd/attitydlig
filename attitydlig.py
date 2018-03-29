@@ -8,12 +8,14 @@ import extractor
 import preprocessor
 import vectorizer
 import gensim
+import numpy as np
 
 def main():
     word_vectors = gensim.models.KeyedVectors.load_word2vec_format('C:\\Users\\olive\\Desktop\\'
                                                                    'Datamängder för uppsats\\'
                                                                    'Swedish Word Vectors\\'
-                                                                   'swectors-300dim.txt', binary=True)
+                                                                   'swectors-300dim.txt', binary=True,
+                                                                   unicode_errors='ignore')
 
     directory = 'C:\\Users\\olive\\Desktop\\Datamängder för uppsats\\Prisjakt\\Utvärderingsdata'
 
@@ -25,16 +27,16 @@ def main():
        # print(line)
 
     preprocessed_reviews = preprocessor.preprocess(extracted_reviews)
-    dictionary = dict.Dictionary(preprocessed_reviews)
-    vectorized_data = vectorizer.vectorize_data(preprocessed_reviews, dictionary, 300)  # 300 word maximum length
+    #dictionary = dict.Dictionary(preprocessed_reviews)
+    vectorized_data = vectorizer.vectorize_data(preprocessed_reviews, word_vectors, 300)  # 300 word maximum length
     x_training = vectorized_data[0]
     x_testing = vectorized_data[1]
     # split into training and testing data
     y_training_and_testing = np.array_split(np.asarray(polarities), [0, int(len(polarities) * 0.9)])
-    y_training = to_categorical(y_training_and_testing[0], 2)
-    y_testing = to_categorical(y_training_and_testing[1], 2)
+    y_training = y_training_and_testing[1]
+    y_testing = y_training_and_testing[2]
 
     tpot = classifier.Classifier()
-    tpot.fit(vectorized_data,polarities)
+    tpot.fit(x_training,y_training)
 
 main()

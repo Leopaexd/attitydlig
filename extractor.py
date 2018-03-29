@@ -48,3 +48,4 @@ def json_extract(directory):
                 text = review['comment']
                 reviews.append(text)
                 polarities.append(polarity)
+    return [reviews, polarities]
