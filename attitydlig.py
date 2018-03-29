@@ -2,7 +2,7 @@
 # Attitydlig - attitydanalys på svenska
 # Huvudfil
 
-import sundstrom_classifier as classifier
+import new_classifier as classifier
 import dictionary as dict
 import extractor
 import preprocessor
