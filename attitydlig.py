@@ -2,7 +2,7 @@
 # Attitydlig - attitydanalys på svenska
 # Huvudfil
 
-import classifier
+import sundstrom_classifier as classifier
 import dictionary as dict
 import extractor
 import preprocessor
@@ -15,7 +15,8 @@ def main():
     word_vectors = gensim.models.KeyedVectors.load_word2vec_format('C:\\Users\\olive\\Desktop\\'
                                                                    'Datamängder för uppsats\\'
                                                                    'Swedish Word Vectors\\'
-                                                                   'swectors-300dim.txt', binary=True)
+                                                                   'swectors-300dim.txt', binary=True,
+                                                                   unicode_errors='ignore')
 
     directory = 'C:\\Users\\olive\\Desktop\\Datamängder för uppsats\\Prisjakt\\Utvärderingsdata'
 
@@ -24,7 +25,7 @@ def main():
     polarities = extracted_data[1]
 
     preprocessed_reviews = preprocessor.preprocess(extracted_reviews)
-    #dictionary = dict.Dictionary(preprocessed_reviews)
+    dictionary = dict.Dictionary(preprocessed_reviews).dictionary
 
     vectorized_data = vectorizer.vectorize_data(preprocessed_reviews,dictionary,300) # 300 word maximum length
     x_training = vectorized_data[0]
@@ -33,11 +34,12 @@ def main():
 
     # split into training and testing data
     y_training_and_testing = np.array_split(np.asarray(polarities),[0,int(len(polarities)*0.9)])
-    y_training =  to_categorical(y_training_and_testing[0],2)
-    y_testing = to_categorical(y_training_and_testing[1],2)
-    NN_classifier = classifier.Classifier()
+    y_training =  y_training_and_testing[1] #to_categorical(y_training_and_testing[1],2)
+    y_testing = y_training_and_testing[2] #to_categorical(y_training_and_testing[2],2)
+    NN_classifier = classifier.Classifier(dictionary,word_vectors)
     NN_classifier.fit(x_training, y_training)
     NN_classifier.evaluate(x_testing, y_testing)
     NN_classifier.custom_evaluate(x_testing, y_testing)
+    print(y_training)
 
 main()

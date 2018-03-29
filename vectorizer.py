@@ -35,13 +35,12 @@ def vectorize_data(preprocessed_data,dictionary, length):
     print("Vectorization completed in ", ("%.2f" % time_elapsed), "seconds")
 
     x_training_and_testing = np.array_split(vectorized_data, [0,int((len(vectorized_data) * 0.9))])
-    print(len(x_training_and_testing))
 
    # x_training = np.vstack(x_training_and_testing[0])
    # x_testing = np.vstack(x_training_and_testing[1])
 
-    x_training = x_training_and_testing[0] # 2st
-    x_testing = x_training_and_testing[1] # 2 st
+    x_training = x_training_and_testing[1]
+    x_testing = x_training_and_testing[2]
 
 
     return [x_training,x_testing]
