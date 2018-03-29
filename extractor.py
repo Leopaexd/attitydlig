@@ -27,8 +27,13 @@ def json_extract(directory):
             for review in loaded_file:
                 polarity = review['grade']
                 text = review['comment']
-                reviews.append(text)
-                polarities.append(polarity)
-
+                if int(polarity) < 5:
+                    polarities.append(0)
+                    reviews.append(text)
+                elif int(polarity) > 6:
+                    polarities.append(1)
+                    reviews.append(text)
+                else:
+                    pass # ignore neutral polarities
 
     return [reviews, polarities]

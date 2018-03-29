@@ -18,7 +18,7 @@ def main():
                                                                    'swectors-300dim.txt', binary=True,
                                                                    unicode_errors='ignore')
 
-    directory = 'C:\\Users\\olive\\Desktop\\Datamängder för uppsats\\Prisjakt\\Utvärderingsdata'
+    directory = 'C:\\Users\\olive\\Desktop\\Datamängder för uppsats\\Prisjakt' #\\Utvärderingsdata
 
     extracted_data = extractor.json_extract(directory)
     extracted_reviews = extracted_data[0]
@@ -34,12 +34,21 @@ def main():
 
     # split into training and testing data
     y_training_and_testing = np.array_split(np.asarray(polarities),[0,int(len(polarities)*0.9)])
-    y_training =  y_training_and_testing[1] #to_categorical(y_training_and_testing[1],2)
-    y_testing = y_training_and_testing[2] #to_categorical(y_training_and_testing[2],2)
+    y_training =  y_training_and_testing[1]
+    y_testing = y_training_and_testing[2]
     NN_classifier = classifier.Classifier(dictionary,word_vectors)
     NN_classifier.fit(x_training, y_training)
     NN_classifier.evaluate(x_testing, y_testing)
     NN_classifier.custom_evaluate(x_testing, y_testing)
     print(y_training)
+
+    ones = 0
+    minus = 0
+    for x in y_testing:
+        if x == 1:
+            ones += 1
+        else:
+            minus+=1
+    print (str(ones) +' ones and ' +str(minus) + ' minus ones')
 
 main()
