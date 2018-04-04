@@ -17,9 +17,9 @@ def main():
                                                                    'GoogleNews-vectors-negative300\\'
                                                                    'GoogleNews-vectors-negative300.bin', binary=True)
 
-    directory = 'C:\\Users\\olive\\Desktop\\Datamängder för uppsats\\ESCW 2016\\Amazon_Instant_Video'
+    directory = 'C:\\Users\\olive\\Desktop\\Datamängder för uppsats\\ESCW 2016\\' #- Utvärderingsmängd'
 
-    extracted_data = extractor.json_extract(directory)
+    extracted_data = extractor.xml_extract(directory)
     extracted_reviews = extracted_data[0]
     polarities = extracted_data[1]
 

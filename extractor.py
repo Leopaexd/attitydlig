@@ -3,7 +3,7 @@
 # Extrahering
 
 import os
-import json
+import xml.etree.ElementTree as ET
 
 # Extract reviews from files in directory and return them in a list.
 def extract(directory):
@@ -28,7 +28,7 @@ def xml_extract(directory):
              for sentence in tree.getroot().findall('sentence'):
                  polarity = sentence.find('polarity').text
                  text = sentence.find('text').text
-                 reviews.append(text)
+                 reviews.append(text.lower())
                  if polarity.upper() == 'POSITIVE':
                      polarities.append(1)
                  else:

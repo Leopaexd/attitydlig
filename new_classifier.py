@@ -9,9 +9,6 @@ import time
 
 EMBEDDING_DIM = 300
 MAX_SEQUENCE_LENGTH = 300
-TRAINABLE = True
-
-
 
 class Classifier:
     def __init__(self,dictionary,word_vectors):
@@ -30,7 +27,7 @@ class Classifier:
                             output_dim=EMBEDDING_DIM,
                             weights=[self.embedding_matrix],
                             input_length=MAX_SEQUENCE_LENGTH,
-                            trainable=False))
+                            trainable=True))
         self.model.add(Conv1D(filters=60, kernel_size=3,
                          padding='same', activation='relu', kernel_regularizer=regularizers.l2(0.01)))
         self.model.add(Conv1D(filters=60, kernel_size=4,
@@ -38,7 +35,7 @@ class Classifier:
         self.model.add(MaxPooling1D(pool_size=2))
         self.model.add(Dropout(0.5))
         self.model.add(Flatten())
-        self.model.add(Dense(units=250, activation='softmax'))
+        self.model.add(Dense(units=250, activation='softmax')) # Testa ReLU?
         self.model.add(Dense(units=1, activation='sigmoid'))
         self.model.compile(loss='binary_crossentropy', optimizer='adam',
                       metrics=['binary_accuracy'])
@@ -63,6 +60,7 @@ class Classifier:
         for a,b in zip(predictions,y_testing):
             if np.all(int(a) == int(b)):
                 hits += 1
+            #print('prediction: ' + str(a) + ' expected: ' + str(b))
         hits = total - hits # To fix reverse-error during development
 
 
