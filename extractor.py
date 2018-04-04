@@ -17,23 +17,23 @@ def extract(directory):
     return reviews
 
 # Extract reviews from files in directory and return them in a list. Polarities are returned in parallel list.
-def json_extract(directory):
+def xml_extract(directory):
     reviews = []
     polarities = []
     for root, dirs, files in os.walk(directory):
         for file in files:
             print('Extracting reviews from ' + file)
-            loaded_file = json.load(open(os.path.join(root, file),'r'))
-            for review in loaded_file:
-                polarity = review['grade']
-                text = review['comment']
-                if int(polarity) < 5:
-                    polarities.append(0)
-                    reviews.append(text)
-                elif int(polarity) > 6:
-                    polarities.append(1)
-                    reviews.append(text)
-                else:
-                    pass # ignore neutral polarities
+            try:
+             tree = ET.parse(os.path.join(root, file))
+             for sentence in tree.getroot().findall('sentence'):
+                 polarity = sentence.find('polarity').text
+                 text = sentence.find('text').text
+                 reviews.append(text)
+                 if polarity.upper() == 'POSITIVE':
+                     polarities.append(1)
+                 else:
+                     polarities.append(0)
+            except ET.ParseError:
+                pass
 
-    return [reviews, polarities]
+    return [reviews,polarities]

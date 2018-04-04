@@ -14,11 +14,10 @@ from keras.utils.np_utils import to_categorical
 def main():
     word_vectors = gensim.models.KeyedVectors.load_word2vec_format('C:\\Users\\olive\\Desktop\\'
                                                                    'Datamängder för uppsats\\'
-                                                                   'Swedish Word Vectors\\'
-                                                                   'swectors-300dim.txt', binary=True,
-                                                                   unicode_errors='ignore')
+                                                                   'GoogleNews-vectors-negative300\\'
+                                                                   'GoogleNews-vectors-negative300.bin', binary=True)
 
-    directory = 'C:\\Users\\olive\\Desktop\\Datamängder för uppsats\\Prisjakt\\' # Utvärderingsdata'
+    directory = 'C:\\Users\\olive\\Desktop\\Datamängder för uppsats\\ESCW 2016\\Amazon_Instant_Video'
 
     extracted_data = extractor.json_extract(directory)
     extracted_reviews = extracted_data[0]
