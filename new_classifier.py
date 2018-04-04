@@ -35,7 +35,6 @@ class Classifier:
                          padding='same', activation='relu', kernel_regularizer=regularizers.l2(0.01)))
         self.model.add(Conv1D(filters=60, kernel_size=4,
                               padding='same', activation='relu',kernel_regularizer=regularizers.l2(0.01)))
-
         self.model.add(MaxPooling1D(pool_size=2))
         self.model.add(Dropout(0.5))
         self.model.add(Flatten())
@@ -47,7 +46,7 @@ class Classifier:
 
     def fit(self, x_training, y_training):
         start = time.time()
-        self.model.fit(x_training, y_training, epochs=5, batch_size=64, verbose=0,validation_split=0.1)
+        self.model.fit(x_training, y_training, epochs=5, batch_size=64, verbose=1,validation_split=0.1)
         time_elapsed = time.time() - start
         print("Model fit in ", ("%.2f" % time_elapsed), "seconds")
 

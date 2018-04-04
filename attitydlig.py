@@ -18,7 +18,7 @@ def main():
                                                                    'swectors-300dim.txt', binary=True,
                                                                    unicode_errors='ignore')
 
-    directory = 'C:\\Users\\olive\\Desktop\\Datamängder för uppsats\\Prisjakt' #\\Utvärderingsdata'
+    directory = 'C:\\Users\\olive\\Desktop\\Datamängder för uppsats\\Prisjakt\\' # Utvärderingsdata'
 
     extracted_data = extractor.json_extract(directory)
     extracted_reviews = extracted_data[0]
@@ -41,14 +41,5 @@ def main():
     NN_classifier.evaluate(x_testing, y_testing)
     NN_classifier.custom_evaluate(x_testing, y_testing)
     print(y_training)
-
-    ones = 0
-    minus = 0
-    for x in y_testing:
-        if x == 1:
-            ones += 1
-        else:
-            minus+=1
-    print (str(ones) +' ones and ' +str(minus) + ' minus ones')
 
 main()
