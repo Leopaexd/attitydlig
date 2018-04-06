@@ -30,7 +30,7 @@ class Classifier:
                             output_dim=EMBEDDING_DIM,
                             weights=[self.embedding_matrix],
                             input_length=MAX_SEQUENCE_LENGTH,
-                            trainable=False))
+                            trainable=True))
         self.model.add(Conv1D(filters=60, kernel_size=3,
                          padding='same', activation='relu', kernel_regularizer=regularizers.l2(0.01)))
         self.model.add(Conv1D(filters=60, kernel_size=4,

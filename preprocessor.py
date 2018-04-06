@@ -17,7 +17,8 @@ def preprocess(unprocessed_reviews):
         tokenized_review = []
         for word in word_tokenize(review):
             if word not in ["." , ","]:
-                tokenized_review.append(stemmer.stem(word).upper())
+                #tokenized_review.append(stemmer.stem(word).upper())
+                tokenized_review.append(word)
         preprocessed_reviews.append(tokenized_review)
         number_of_reviews += 1
     time_elapsed = time.time() - start
