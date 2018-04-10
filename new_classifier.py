@@ -32,9 +32,12 @@ class Classifier:
                             input_length=MAX_SEQUENCE_LENGTH,
                             trainable=True))
         self.model.add(Conv1D(filters=60, kernel_size=3,
-                         padding='same', activation='relu', kernel_regularizer=regularizers.l2(0.01)))
+                         padding='same', activation='relu', kernel_regularizer=regularizers.l2(0.01))) #
         self.model.add(Conv1D(filters=60, kernel_size=4,
                               padding='same', activation='relu',kernel_regularizer=regularizers.l2(0.01)))
+        # self.model.add(Conv1D(filters=60, kernel_size=5,
+                              # padding='same', activation='relu', kernel_regularizer=regularizers.l2(0.01)))
+
         self.model.add(MaxPooling1D(pool_size=2))
         self.model.add(Dropout(0.5))
         self.model.add(Flatten())
@@ -46,7 +49,7 @@ class Classifier:
 
     def fit(self, x_training, y_training):
         start = time.time()
-        self.model.fit(x_training, y_training, epochs=5, batch_size=64, verbose=1,validation_split=0.1)
+        self.model.fit(x_training, y_training, epochs=1, batch_size=64, verbose=1,validation_split=0.1)
         time_elapsed = time.time() - start
         print("Model fit in ", ("%.2f" % time_elapsed), "seconds")
 
@@ -72,18 +75,3 @@ class Classifier:
         print(loss_and_metrics)
 
 
-
-"""
-# Instantiate a sequential model
-self.model = Sequential()
-# Embedding layer as the first layer
-
-model.fit(X_train, y_train,
-            validation_data=(X_val, y_val),
-            epochs=3,
-            batch_size=32)
-# Evaluate model on new data...
-scores = model.evaluate(X_test, y_test)
-# ...or generate predictions based on new data
-predictions = model.predict(X_test)
-"""

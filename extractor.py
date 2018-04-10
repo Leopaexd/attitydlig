@@ -30,7 +30,7 @@ def json_extract(directory):
                 if int(polarity) < 5:
                     polarities.append(0)
                     reviews.append(text)
-                elif int(polarity) > 6:
+                elif int(polarity) > 7:
                     polarities.append(1)
                     reviews.append(text)
                 else:
