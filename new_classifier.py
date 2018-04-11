@@ -1,4 +1,3 @@
-# Model based on http://www.diva-portal.org/smash/record.jsf?pid=diva2%3A1105494&dswid=-9724
 
 from keras.models import Sequential
 from keras.layers import *
@@ -9,8 +8,6 @@ import time
 
 EMBEDDING_DIM = 300
 MAX_SEQUENCE_LENGTH = 300
-TRAINABLE = True
-
 
 
 class Classifier:
@@ -25,31 +22,30 @@ class Classifier:
                 self.embedding_matrix[index] = word_vector
 
 
+
         self.model = Sequential()
         self.model.add(Embedding(len(dictionary) + 1,
                             output_dim=EMBEDDING_DIM,
                             weights=[self.embedding_matrix],
                             input_length=MAX_SEQUENCE_LENGTH,
                             trainable=True))
-        self.model.add(Conv1D(filters=60, kernel_size=3,
-                         padding='same', activation='relu', kernel_regularizer=regularizers.l2(0.01))) #
-        self.model.add(Conv1D(filters=60, kernel_size=4,
-                              padding='same', activation='relu',kernel_regularizer=regularizers.l2(0.01)))
-        # self.model.add(Conv1D(filters=60, kernel_size=5,
-                              # padding='same', activation='relu', kernel_regularizer=regularizers.l2(0.01)))
+        self.model.add(Conv1D(filters=100, kernel_size=3,
+                         padding='same', activation='relu'))
+        self.model.add(Conv1D(filters=100, kernel_size=4,
+                              padding='same', activation='relu'))
 
         self.model.add(MaxPooling1D(pool_size=2))
-        self.model.add(Dropout(0.5))
+       # self.model.add(Dropout(0.5))
         self.model.add(Flatten())
-        self.model.add(Dense(units=250, activation='softmax'))
+        self.model.add(Dense(units=250, activation='relu'))
         self.model.add(Dense(units=1, activation='sigmoid'))
-        self.model.compile(loss='binary_crossentropy', optimizer='adam',
+        self.model.compile(loss='binary_crossentropy', optimizer='adadelta',
                       metrics=['binary_accuracy'])
 
 
     def fit(self, x_training, y_training):
         start = time.time()
-        self.model.fit(x_training, y_training, epochs=1, batch_size=64, verbose=1,validation_split=0.1)
+        self.model.fit(x_training, y_training, epochs=10, batch_size=64, verbose=1,validation_split=0.1)
         time_elapsed = time.time() - start
         print("Model fit in ", ("%.2f" % time_elapsed), "seconds")
 
@@ -59,6 +55,8 @@ class Classifier:
 
     def custom_evaluate(self,x_testing,y_testing):
         predictions = self.model.predict(x_testing,verbose=1)
+        for line in predictions:
+            print (line)
         hits = 0
         total = len(y_testing)
         if len(y_testing) != len(predictions):
@@ -71,7 +69,5 @@ class Classifier:
 
         print('Accuracy: ' + str(hits/total) + '. ' + str(hits) + '/' + str(total) + ' hits')
         print('x_testing: ' +str(len(x_testing)) + ' y_testing: ' + str(len(y_testing)))
-        loss_and_metrics = self.model.evaluate(x_testing, y_testing, batch_size=128, verbose=1)
+        loss_and_metrics = self.model.evaluate(x_testing, np.array(y_testing), batch_size=128, verbose=1)
         print(loss_and_metrics)
-
-

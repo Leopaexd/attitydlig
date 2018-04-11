@@ -4,6 +4,7 @@
 
 import os
 import json
+import random
 
 # Extract reviews from files in directory and return them in a list.
 def extract(directory):
@@ -31,8 +32,9 @@ def json_extract(directory):
                     polarities.append(0)
                     reviews.append(text)
                 elif int(polarity) > 7:
-                    polarities.append(1)
-                    reviews.append(text)
+                    if random.randint(1, 4) == 1:  # get 1/4 of positive reviews to balance
+                        polarities.append(1)
+                        reviews.append(text)
                 else:
                     pass # ignore neutral polarities
 

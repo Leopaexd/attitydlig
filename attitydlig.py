@@ -18,7 +18,7 @@ def main():
                                                                    'swectors-300dim.txt', binary=True,
                                                                    unicode_errors='ignore')
 
-    directory = 'C:\\Users\\olive\\Desktop\\Datamängder för uppsats\\Prisjakt' # \\Utvärderingsdata'
+    directory = 'C:\\Users\\olive\\Desktop\\Datamängder för uppsats\\Prisjakt\\Utvärderingsdata'
 
     extracted_data = extractor.json_extract(directory)
     extracted_reviews = extracted_data[0]
@@ -40,8 +40,27 @@ def main():
     y_training =  y_training_and_testing[1]
     y_testing = y_training_and_testing[2]
 
+    pos = 0
+    tot = 0
+    for value in y_training:
+        tot += 1
+        if value == 1:
+            pos += 1
+    print('pos: ' + str(pos) + '/' + str(tot) +' = ' + str(pos/tot))
+
+
+    # Translated data 
+    with open('untranslated_reviews validation combined.txt','r') as file:
+        untranslated_reviews = np.concatenate(vectorizer.vectorize_data(preprocessor.preprocess(file.readlines()),dictionary,300))
+    with open ('translated_polarities validation combined.txt','r') as file:
+        translated_polarities = []
+        for line in file:
+            translated_polarities.append(int(line))
+
+
     NN_classifier = classifier.Classifier(dictionary,word_vectors)
     NN_classifier.fit(x_training, y_training)
     NN_classifier.custom_evaluate(x_testing, y_testing)
+    NN_classifier.custom_evaluate(untranslated_reviews, translated_polarities)
 
 main()
