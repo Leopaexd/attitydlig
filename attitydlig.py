@@ -18,7 +18,7 @@ def main():
                                                                    'swectors-300dim.txt', binary=True,
                                                                    unicode_errors='ignore')
 
-    directory = 'C:\\Users\\olive\\Desktop\\Datamängder för uppsats\\Prisjakt\\Utvärderingsdata'
+    directory = 'C:\\Users\\olive\\Desktop\\Datasets_for_theis\\Prisjakt\\training_data'
 
     extracted_data = extractor.json_extract(directory)
     extracted_reviews = extracted_data[0]
