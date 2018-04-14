@@ -60,7 +60,8 @@ def main():
 
     NN_classifier = classifier.Classifier(dictionary,word_vectors)
     NN_classifier.fit(x_training, y_training)
-    NN_classifier.custom_evaluate(x_testing, y_testing)
-    NN_classifier.custom_evaluate(untranslated_reviews, translated_polarities)
+    NN_classifier.evaluate(x_testing, y_testing)
+    NN_classifier.evaluate(untranslated_reviews, np.array(translated_polarities))
+    # NN_classifier.custom_evaluate(untranslated_reviews, translated_polarities)
 
 main()

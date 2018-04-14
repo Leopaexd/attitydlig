@@ -30,12 +30,15 @@ class Classifier:
                             input_length=MAX_SEQUENCE_LENGTH,
                             trainable=True))
         self.model.add(Conv1D(filters=100, kernel_size=3,
-                         padding='same', activation='relu'))
+                         padding='same', activation='relu', kernel_regularizer=regularizers.l2(0.01)))
+        self.model.add(MaxPooling1D(pool_size=2))
         self.model.add(Conv1D(filters=100, kernel_size=4,
                               padding='same', activation='relu'))
-
         self.model.add(MaxPooling1D(pool_size=2))
-       # self.model.add(Dropout(0.5))
+        self.model.add(Conv1D(filters=100, kernel_size=5,
+                              padding='same', activation='relu'))
+        self.model.add(MaxPooling1D(pool_size=2))
+        self.model.add(Dropout(0.5))
         self.model.add(Flatten())
         self.model.add(Dense(units=250, activation='relu'))
         self.model.add(Dense(units=1, activation='sigmoid'))
@@ -45,7 +48,7 @@ class Classifier:
 
     def fit(self, x_training, y_training):
         start = time.time()
-        self.model.fit(x_training, y_training, epochs=10, batch_size=64, verbose=1,validation_split=0.1)
+        self.model.fit(x_training, y_training, epochs=5, batch_size=64, verbose=1,validation_split=0.1)
         time_elapsed = time.time() - start
         print("Model fit in ", ("%.2f" % time_elapsed), "seconds")
 
@@ -55,14 +58,13 @@ class Classifier:
 
     def custom_evaluate(self,x_testing,y_testing):
         predictions = self.model.predict(x_testing,verbose=1)
-        for line in predictions:
-            print (line)
         hits = 0
         total = len(y_testing)
         if len(y_testing) != len(predictions):
             print('Length mismatch')
         for a,b in zip(predictions,y_testing):
-            if np.all(int(a) == int(b)):
+            # if np.all(int(round(a)) == int(round(b))):
+            if (int(a) == int(b)):
                 hits += 1
         hits = total - hits # To fix reverse-error during development
 
