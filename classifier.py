@@ -4,38 +4,37 @@
 
 
 from keras.models import Sequential
-from keras.layers import Dense
+from keras.layers import *
+from keras import regularizers
 import numpy as np
 import time
 
-class Classifier:
-    def __init__(self):
-        self.model = Sequential()
-        self.model.add(Dense(units=128, activation='relu',input_dim=300))
-        self.model.add(Dense(units=2, activation='softmax'))
-        self.model.compile(loss='categorical_crossentropy',
-                           optimizer='sgd',
-                           metrics=['accuracy'])
+def create_model(x_training, y_training, x_testing, y_testing):
+    start = time.time()
+    model = Sequential()
+    model.add(Embedding(len(dictionary) + 1,
+                             output_dim=EMBEDDING_DIM,
+                             weights=[self.embedding_matrix],
+                             input_length=MAX_SEQUENCE_LENGTH,
+                             trainable=True))
+    model.add(Conv1D(filters=100, kernel_size=3,
+                          padding='same', activation='relu', kernel_regularizer=regularizers.l2(0.01)))
+    model.add(MaxPooling1D(pool_size=2))
+    model.add(Conv1D(filters=100, kernel_size=4,
+                          padding='same', activation='relu'))
+    model.add(MaxPooling1D(pool_size=2))
+    model.add(Conv1D(filters=100, kernel_size=5,
+                          padding='same', activation='relu'))
+    model.add(MaxPooling1D(pool_size=2))
+    model.add(Dropout(0.5))
+    model.add(Flatten())
+    model.add(Dense(units=250, activation='relu'))
+    model.add(Dense(units=1, activation='sigmoid'))
 
-    def fit(self, x_training, y_training):
-        start = time.time()
-        self.model.fit(x_training, y_training, epochs=2000, batch_size=64, verbose=0,validation_split=0.1)
-        time_elapsed = time.time() - start
-        print("Model fit in ", ("%.2f" % time_elapsed), "seconds")
+    model.compile(loss='binary_crossentropy', optimizer='adadelta',
+                       metrics=['binary_accuracy'])
 
-    def evaluate(self,x_testing,y_testing):
-        loss_and_metrics = self.model.evaluate(x_testing,y_testing,batch_size=128,verbose=1)
-        print(loss_and_metrics)
-
-    def custom_evaluate(self,x_testing,y_testing):
-        predictions = self.model.predict(x_testing,verbose=1)
-        hits = 0
-        total = len(y_testing)
-        if len(y_testing) != len(predictions):
-            print('Length mismatch')
-        for a,b in zip(predictions,y_testing):
-            if np.all(a == b): hits += 1
-        print('Accuracy: ' + str(hits/total) + '. ' + str(hits) + '/' + str(total) + ' hits')
-        print('x_testing: ' +str(len(x_testing)) + ' y_testing: ' + str(len(y_testing)))
-        loss_and_metrics = self.model.evaluate(x_testing, y_testing, batch_size=128, verbose=1)
-        print(loss_and_metrics)
+    model.fit(x_training, y_training, epochs=5, batch_size=64, verbose=1, validation_split=0.1)
+    time_elapsed = time.time() - start
+    print("Model fit in ", ("%.2f" % time_elapsed), "seconds")
+    return model
