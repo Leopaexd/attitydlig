@@ -13,12 +13,12 @@ import review_translator
 
 def main():
     word_vectors = gensim.models.KeyedVectors.load_word2vec_format('C:\\Users\\olive\\Desktop\\'
-                                                                   'Datamängder för uppsats\\'
+                                                                   'Datasets_for_thesis\\'
                                                                    'Swedish Word Vectors\\'
                                                                    'swectors-300dim.txt', binary=True,
                                                                    unicode_errors='ignore')
 
-    directory = 'C:\\Users\\olive\\Desktop\\Datamängder för uppsats\\Prisjakt\\Utvärderingsdata'
+    directory = 'C:\\Users\\olive\\Desktop\\Datasets_for_thesis\\Prisjakt\\training_data'
 
     extracted_data = extractor.json_extract(directory)
     extracted_reviews = extracted_data[0]
