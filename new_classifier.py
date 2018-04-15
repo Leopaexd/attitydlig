@@ -21,24 +21,27 @@ class Classifier:
             if word_vector is not None:
                 self.embedding_matrix[index] = word_vector
 
-
         self.model = Sequential()
         self.model.add(Embedding(len(dictionary) + 1,
-                            output_dim=EMBEDDING_DIM,
-                            weights=[self.embedding_matrix],
-                            input_length=MAX_SEQUENCE_LENGTH,
-                            trainable=True))
-        self.model.add(Conv1D(filters=60, kernel_size=3,
-                         padding='same', activation='relu', kernel_regularizer=regularizers.l2(0.01)))
-        self.model.add(Conv1D(filters=60, kernel_size=4,
-                              padding='same', activation='relu',kernel_regularizer=regularizers.l2(0.01)))
+                                 output_dim=EMBEDDING_DIM,
+                                 weights=[self.embedding_matrix],
+                                 input_length=MAX_SEQUENCE_LENGTH,
+                                 trainable=True))
+        self.model.add(Conv1D(filters=200, kernel_size=3,
+                              padding='same', activation='relu'))
         self.model.add(MaxPooling1D(pool_size=2))
-        self.model.add(Dropout(0.5))
+        self.model.add(Conv1D(filters=200, kernel_size=4,
+                              padding='same', activation='relu'))
+        self.model.add(MaxPooling1D(pool_size=2))
+        self.model.add(Conv1D(filters=200, kernel_size=5,
+                              padding='same', activation='relu', kernel_regularizer=regularizers.l2(0.01)))
+        self.model.add(MaxPooling1D(pool_size=2))
+        self.model.add(Dropout(0.7))
         self.model.add(Flatten())
-        self.model.add(Dense(units=250, activation='softmax')) # Testa ReLU?
+        self.model.add(Dense(units=250, activation='relu'))
         self.model.add(Dense(units=1, activation='sigmoid'))
-        self.model.compile(loss='binary_crossentropy', optimizer='adam',
-                      metrics=['binary_accuracy'])
+        self.model.compile(loss='binary_crossentropy', optimizer='adadelta',
+                           metrics=['binary_accuracy'])
 
 
     def fit(self, x_training, y_training):
