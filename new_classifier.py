@@ -47,6 +47,24 @@ def f1(y_true, y_pred):
     recall = recall(y_true, y_pred)
     return 2*((precision*recall)/(precision+recall+K.epsilon()))
 
+def matthews_correlation(y_true, y_pred):
+    y_pred_pos = K.round(K.clip(y_pred, 0, 1))
+    y_pred_neg = 1 - y_pred_pos
+
+    y_pos = K.round(K.clip(y_true, 0, 1))
+    y_neg = 1 - y_pos
+
+    tp = K.sum(y_pos * y_pred_pos)
+    tn = K.sum(y_neg * y_pred_neg)
+
+    fp = K.sum(y_neg * y_pred_pos)
+    fn = K.sum(y_pos * y_pred_neg)
+
+    numerator = (tp * tn - fp * fn)
+    denominator = K.sqrt((tp + fp) * (tp + fn) * (tn + fp) * (tn + fn))
+
+    return numerator / (denominator + K.epsilon())
+
 class Classifier:
     def __init__(self,dictionary,word_vectors):
         self.embedding_matrix=np.zeros((len(dictionary)+1, 300))
@@ -80,7 +98,7 @@ class Classifier:
         self.model.add(Dense(units=250, activation='relu'))
         self.model.add(Dense(units=1, activation='sigmoid'))
         self.model.compile(loss='binary_crossentropy', optimizer='adadelta',
-                      metrics=['binary_accuracy', f1,f1])
+                      metrics=['binary_accuracy', f1,f1,matthews_correlation])
 
 
     def fit(self, x_training, y_training):

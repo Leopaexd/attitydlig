@@ -46,7 +46,15 @@ def main():
         tot += 1
         if value == 1:
             pos += 1
-    print('pos: ' + str(pos) + '/' + str(tot) +' = ' + str(pos/tot))
+    print('training data pos: ' + str(pos) + '/' + str(tot) +' = ' + str(pos/tot))
+
+    pos = 0
+    tot = 0
+    for value in y_testing:
+        tot += 1
+        if value == 1:
+            pos += 1
+    print('validation split pos: ' + str(pos) + '/' + str(tot) + ' = ' + str(pos / tot))
 
 
     # Translated data
@@ -56,6 +64,15 @@ def main():
         translated_polarities = []
         for line in file:
             translated_polarities.append(int(line))
+    pos = 0
+    tot = 0
+    for value in translated_polarities:
+        tot += 1
+        if value == 1:
+            pos += 1
+    print('testing data pos: ' + str(pos) + '/' + str(tot) + ' = ' + str(pos / tot))
+
+
 
 
     NN_classifier = classifier.Classifier(dictionary,word_vectors)
