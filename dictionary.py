@@ -13,6 +13,7 @@ class Dictionary(object):
         start = time.time()
         print("Indexing words")
         for post in preprocessed_data:
+            if len(self.dictionary) > 200000: break
             for word in post:
                 if word not in self.dictionary:
                     self.dictionary[word] = len(self.dictionary)
