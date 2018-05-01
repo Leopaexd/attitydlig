@@ -137,22 +137,22 @@ def create_model(x_train, y_train, x_test, y_test, embedding_matrix):
                              output_dim=300,
                              weights=[embedding_matrix],
                              input_length=300,
-                             trainable={{choice([True,False])}}))
+                             trainable=True))
     model.add(Conv1D(filters=100, kernel_size=3,
-                          padding='same', activation='relu', kernel_regularizer={{choice([None,regularizers.l2(0.01)])}}))
-    model.add(MaxPooling1D(pool_size={{choice([2, 3])}}))
+                          padding='same', activation='relu', kernel_regularizer=None))
+    model.add(MaxPooling1D(pool_size=2))
     model.add(Conv1D(filters=100, kernel_size=4,
-                          padding='same', activation='relu', kernel_regularizer={{choice([None,regularizers.l2(0.01)])}}))
+                          padding='same', activation='relu', kernel_regularizer=None))
     model.add(MaxPooling1D(pool_size={{choice([2,3])}}))
     model.add(Conv1D(filters=100, kernel_size=5,
                           padding='same', activation='relu', kernel_regularizer={{choice([None,regularizers.l2(0.01)])}}))
-    model.add(MaxPooling1D(pool_size={{choice([2, 3])}}))
-    model.add(Dropout({{choice([0.1,0.3,0.5,0.7])}}))
+    model.add(MaxPooling1D(pool_size=2))
+    model.add(Dropout(0.7))
     model.add(Flatten())
     model.add(Dense(units=250, activation={{choice(['relu','sigmoid'])}}))
     model.add(Dense(units=1, activation='sigmoid'))
 
-    model.compile(loss='binary_crossentropy', optimizer='adadelta',
+    model.compile(loss='binary_crossentropy', optimizer={{choice(['adadelta','adam'])}},
                        metrics=[matthews_correlation,'binary_accuracy'])
 
     model.fit(x_train, y_train, epochs=5, batch_size=64, verbose=1, validation_split=0.1)
@@ -170,7 +170,7 @@ def main():
     best_run, best_model = optim.minimize(model=create_model,
                               data=prepare_data,
                               algo=tpe.suggest,
-                              max_evals=10, # todo 10
+                              max_evals=10, #
                               trials=Trials())
     # print("Evalutation of best performing model:")
     # print(best_model.evaluate(test_data[0],test_data[1]))
