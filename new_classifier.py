@@ -7,6 +7,7 @@ import time
 from keras.callbacks import Callback
 from sklearn.metrics import  f1_score, precision_score, recall_score
 from keras import backend as K
+import tensorflow as tf
 
 
 class Metrics(Callback):
@@ -14,7 +15,6 @@ class Metrics(Callback):
         self.val_f1s = []
         self.val_recalls = []
         self.val_precisions = []
-
 
     def on_epoch_end(self, epoch, logs={}):
         val_predict = (np.asarray(self.model.predict(self.validation_data[0]))).round()
@@ -45,6 +45,51 @@ def f1(y_true, y_pred):
     precision = precision(y_true, y_pred)
     recall = recall(y_true, y_pred)
     return 2*((precision*recall)/(precision+recall+K.epsilon()))
+
+def inverse_f1(y_true, y_pred):
+    def recall(y_true, y_pred):
+        true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
+
+        possible_positives = K.sum(K.round(K.clip(y_true, 0, 1)))
+        recall = true_positives / (possible_positives + K.epsilon())
+        return recall
+
+    def precision(y_true, y_pred):
+        true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
+        predicted_positives = K.sum(K.round(K.clip(y_pred, 0, 1)))
+        precision = true_positives / (predicted_positives + K.epsilon())
+        return precision
+    precision = precision(y_true, y_pred)
+    recall = recall(y_true, y_pred)
+    return 2*((precision*recall)/(precision+recall+K.epsilon()))
+
+def matthews_correlation(y_true, y_pred):
+    pos = 0
+    total = 0
+    for value in tf.unstack(y_pred): # todo: k.round?
+        total += 1
+        if value == 1:
+            pos += 1
+    false = 0
+    fp = 0
+    fn = 0
+    tp = 0
+    tn = 0
+
+    for a, b in zip(tf.unpack(y_pred), y_true):
+        if a == b:
+            if a == 1: tp += 1
+            if a == 0: tn += 1
+        if a != b:
+            false += 1
+            if a == 1: fp += 1
+            if a == 0: fn += 1
+
+    numerator = (tp * tn) - (fp * fn)
+    denominator = np.sqrt((tp + fp) * (fp + fn) * (tn + fp) * (tn + fn))
+    mcc = numerator / denominator
+
+    return mcc
 
 class Classifier:
     def __init__(self,dictionary,word_vectors):
@@ -93,22 +138,38 @@ class Classifier:
     def evaluate(self,x_testing,y_testing):
         loss_and_metrics = self.model.evaluate(x_testing,y_testing,batch_size=128,verbose=1)
         print(loss_and_metrics)
-        # print(f1(K.variable(y_testing),K.variable(self.model.predict(x_testing))))
 
     def custom_evaluate(self,x_testing,y_testing):
-        predictions = self.model.predict(x_testing,verbose=1)
-        hits = 0
-        total = len(y_testing)
-        if len(y_testing) != len(predictions):
-            print('Length mismatch')
-        for a,b in zip(predictions,y_testing):
-            # if np.all(int(round(a)) == int(round(b))):
-            if (int(a) == int(b)):
-                hits += 1
-        hits = total - hits # To fix reverse-error during development
+        # Computes Matthews Correlaion Coefficient
+        pos = 0
+        total = 0
+        for value in np.around(self.model.predict(x_testing)):
+            total += 1
+            if value == 1:
+                pos += 1
+        false = 0
+        fp = 0
+        fn = 0
+        tp = 0
+        tn = 0
+        print('pos: ' + str(pos) + '/' + str(total) + ' = ' + str(pos / total))
+        for a, b in zip(np.around(self.model.predict(x_testing)), y_testing):
+            if a == b:
+                if a == 1: tp += 1
+                if a == 0: tn += 1
+            if a != b:
+                false += 1
+                if a == 1: fp += 1
+                if a == 0: fn += 1
 
-
-        print('Accuracy: ' + str(hits/total) + '. ' + str(hits) + '/' + str(total) + ' hits')
+        print('false: ' + str(false) + '/' + str(total) + ' = ' + str(false / total))
+        print('false positives: ' + str(fp) + ' false negatives: ' + str(fn))
+        print('Accuracy: ' + str((total-false)/total) + '. ' + str(total-false) + '/' + str(total) + ' hits')
         print('x_testing: ' +str(len(x_testing)) + ' y_testing: ' + str(len(y_testing)))
+        numerator = (tp*tn)-(fp*fn)
+        denominator = np.sqrt((tp+fp)*(fp+fn)*(tn+fp)*(tn+fn))
+        mcc = numerator/denominator
+        print('Manual mcc = ' + str(mcc))
+
         loss_and_metrics = self.model.evaluate(x_testing, np.array(y_testing), batch_size=128, verbose=1)
         print(loss_and_metrics)
