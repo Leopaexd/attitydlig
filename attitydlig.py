@@ -18,6 +18,48 @@ from keras import backend
 import time
 from hyperas.distributions import uniform, choice
 from hyperopt import STATUS_OK
+from keras import backend as K
+from keras.callbacks import Callback
+from sklearn.metrics import  f1_score, precision_score, recall_score
+
+class Metrics(Callback):
+    def on_train_begin(self, logs={}):
+        self.val_f1s = []
+        self.val_recalls = []
+        self.val_precisions = []
+
+
+    def on_epoch_end(self, epoch, logs={}):
+        val_predict = (np.asarray(self.model.predict(self.validation_data[0]))).round()
+        val_targ = self.validation_data[1]
+        _val_f1 = f1_score(val_targ, val_predict)
+        _val_recall = recall_score(val_targ, val_predict)
+        _val_precision = precision_score(val_targ, val_predict)
+        self.val_f1s.append(_val_f1)
+        self.val_recalls.append(_val_recall)
+        self.val_precisions.append(_val_precision)
+        print (' — val_f1: % f — val_precision: % f — val_recall % f' % (_val_f1, _val_precision, _val_recall))
+        return
+
+metrics = Metrics()
+
+def f1(y_true, y_pred):
+    def recall(y_true, y_pred):
+        true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
+        possible_positives = K.sum(K.round(K.clip(y_true, 0, 1)))
+        recall = true_positives / (possible_positives + K.epsilon())
+        return recall
+
+    def precision(y_true, y_pred):
+        true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
+        predicted_positives = K.sum(K.round(K.clip(y_pred, 0, 1)))
+        precision = true_positives / (predicted_positives + K.epsilon())
+        return precision
+    precision = precision(y_true, y_pred)
+    recall = recall(y_true, y_pred)
+    return 2*((precision*recall)/(precision+recall+K.epsilon()))
+
+
 
 def prepare_data():
     directory = 'C:\\Users\\olive\\Desktop\\Datasets_for_thesis\\Prisjakt\\training_data'
@@ -70,6 +112,24 @@ def translated_data():
     return [untranslated_reviews,np.array(translated_polarities)]
 
 def create_model(x_train, y_train, x_test, y_test, embedding_matrix):
+    def matthews_correlation(y_true, y_pred):
+        y_pred_pos = K.round(K.clip(y_pred, 0, 1))
+        y_pred_neg = 1 - y_pred_pos
+
+        y_pos = K.round(K.clip(y_true, 0, 1))
+        y_neg = 1 - y_pos
+
+        tp = K.sum(y_pos * y_pred_pos)
+        tn = K.sum(y_neg * y_pred_neg)
+
+        fp = K.sum(y_neg * y_pred_pos)
+        fn = K.sum(y_pos * y_pred_neg)
+
+        numerator = (tp * tn - fp * fn)
+        denominator = K.sqrt((tp + fp) * (tp + fn) * (tn + fp) * (tn + fn))
+
+        return numerator / (denominator + K.epsilon())
+
     backend.clear_session() # prevent excessive memory use
     start = time.time()
     model = Sequential()
@@ -77,25 +137,25 @@ def create_model(x_train, y_train, x_test, y_test, embedding_matrix):
                              output_dim=300,
                              weights=[embedding_matrix],
                              input_length=300,
-                             trainable=True))
-    model.add(Conv1D(filters={{choice([64,100,200])}}, kernel_size=3,
+                             trainable={{choice([True,False])}}))
+    model.add(Conv1D(filters=100, kernel_size=3,
                           padding='same', activation='relu', kernel_regularizer={{choice([None,regularizers.l2(0.01)])}}))
-    model.add(MaxPooling1D(pool_size=2))
-    model.add(Conv1D(filters={{choice([64,100,200])}}, kernel_size=4,
+    model.add(MaxPooling1D(pool_size={{choice([2, 3])}}))
+    model.add(Conv1D(filters=100, kernel_size=4,
                           padding='same', activation='relu', kernel_regularizer={{choice([None,regularizers.l2(0.01)])}}))
     model.add(MaxPooling1D(pool_size={{choice([2,3])}}))
-    model.add(Conv1D(filters={{choice([64,100,200])}}, kernel_size=5,
+    model.add(Conv1D(filters=100, kernel_size=5,
                           padding='same', activation='relu', kernel_regularizer={{choice([None,regularizers.l2(0.01)])}}))
-    model.add(MaxPooling1D(pool_size=2))
-    model.add(Dropout({{uniform(0,0.6)}}))
+    model.add(MaxPooling1D(pool_size={{choice([2, 3])}}))
+    model.add(Dropout({{choice([0.1,0.3,0.5,0.7])}}))
     model.add(Flatten())
     model.add(Dense(units=250, activation={{choice(['relu','sigmoid'])}}))
     model.add(Dense(units=1, activation='sigmoid'))
 
     model.compile(loss='binary_crossentropy', optimizer='adadelta',
-                       metrics=['binary_accuracy'])
+                       metrics=[matthews_correlation,'binary_accuracy'])
 
-    model.fit(x_train, y_train, epochs=5, batch_size={{choice([16, 32, 64, 128])}}, verbose=1, validation_split=0.1)
+    model.fit(x_train, y_train, epochs=5, batch_size=64, verbose=1, validation_split=0.1)
     time_elapsed = time.time() - start
     print("Model fit in ", ("%.2f" % time_elapsed), "seconds")
     score = model.evaluate(x_test, y_test, verbose=0)
