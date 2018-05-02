@@ -8,6 +8,7 @@ import time
 from keras.callbacks import Callback
 from sklearn.metrics import  f1_score, precision_score, recall_score
 from keras import backend as K
+import tensorflow as tf
 
 
 class Metrics(Callback):
@@ -84,13 +85,13 @@ class Classifier:
                             weights=[self.embedding_matrix],
                             input_length=300,
                             trainable=True))
-        self.model.add(Conv1D(filters=200, kernel_size=3,
+        self.model.add(Conv1D(filters=100, kernel_size=3,
                          padding='same', activation='relu'))
         self.model.add(MaxPooling1D(pool_size=2))
-        self.model.add(Conv1D(filters=200, kernel_size=4,
+        self.model.add(Conv1D(filters=100, kernel_size=4,
                               padding='same', activation='relu'))
-        self.model.add(MaxPooling1D(pool_size=2))
-        self.model.add(Conv1D(filters=200, kernel_size=5,
+        self.model.add(MaxPooling1D(pool_size=3))
+        self.model.add(Conv1D(filters=100, kernel_size=5,
                               padding='same', activation='relu', kernel_regularizer=regularizers.l2(0.01)))
         self.model.add(MaxPooling1D(pool_size=2))
         self.model.add(Dropout(0.7))
@@ -105,7 +106,7 @@ class Classifier:
         tensorboard = TensorBoard(log_dir="logs/{}".format(time.time()))
         start = time.time()
         self.model.fit(x_training, y_training, epochs=5, batch_size=64, verbose=1,validation_split=0.1,
-                       callbacks=[tensorboard,metrics])
+                       callbacks=[tensorboard,metrics],class_weight={0:1.,1:1.})
         time_elapsed = time.time() - start
         print("Model fit in ", ("%.2f" % time_elapsed), "seconds")
 
@@ -114,20 +115,37 @@ class Classifier:
         print(loss_and_metrics)
         # print(f1(K.variable(y_testing),K.variable(self.model.predict(x_testing))))
 
-    def custom_evaluate(self,x_testing,y_testing):
-        predictions = self.model.predict(x_testing,verbose=1)
-        hits = 0
-        total = len(y_testing)
-        if len(y_testing) != len(predictions):
-            print('Length mismatch')
-        for a,b in zip(predictions,y_testing):
-            # if np.all(int(round(a)) == int(round(b))):
-            if (int(a) == int(b)):
-                hits += 1
-        hits = total - hits # To fix reverse-error during development
+    def custom_evaluate(self, x_testing, y_testing):
+        # Computes Matthews Correlaion Coefficient
+        pos = 0
+        total = 0
+        for value in np.around(self.model.predict(x_testing)):
+            total += 1
+            if value == 1:
+                pos += 1
+        false = 0
+        fp = 0
+        fn = 0
+        tp = 0
+        tn = 0
+        print('pos: ' + str(pos) + '/' + str(total) + ' = ' + str(pos / total))
+        for a, b in zip(np.around(self.model.predict(x_testing)), y_testing):
+            if a == b:
+                if a == 1: tp += 1
+                if a == 0: tn += 1
+            if a != b:
+                false += 1
+                if a == 1: fp += 1
+                if a == 0: fn += 1
 
+        print('false: ' + str(false) + '/' + str(total) + ' = ' + str(false / total))
+        print('false positives: ' + str(fp) + ' false negatives: ' + str(fn))
+        print('Accuracy: ' + str((total - false) / total) + '. ' + str(total - false) + '/' + str(total) + ' hits')
+        print('x_testing: ' + str(len(x_testing)) + ' y_testing: ' + str(len(y_testing)))
+        numerator = (tp * tn) - (fp * fn)
+        denominator = np.sqrt((tp + fp) * (fp + fn) * (tn + fp) * (tn + fn))
+        mcc = numerator / denominator
+        print('Manual mcc = ' + str(mcc))
 
-        print('Accuracy: ' + str(hits/total) + '. ' + str(hits) + '/' + str(total) + ' hits')
-        print('x_testing: ' +str(len(x_testing)) + ' y_testing: ' + str(len(y_testing)))
         loss_and_metrics = self.model.evaluate(x_testing, np.array(y_testing), batch_size=128, verbose=1)
         print(loss_and_metrics)
