@@ -64,32 +64,23 @@ def inverse_f1(y_true, y_pred):
     return 2*((precision*recall)/(precision+recall+K.epsilon()))
 
 def matthews_correlation(y_true, y_pred):
-    pos = 0
-    total = 0
-    for value in tf.unstack(y_pred): # todo: k.round?
-        total += 1
-        if value == 1:
-            pos += 1
-    false = 0
-    fp = 0
-    fn = 0
-    tp = 0
-    tn = 0
+    y_pred_pos = K.round(K.clip(y_pred, 0, 1))
+    y_pred_neg = 1 - y_pred_pos
 
-    for a, b in zip(tf.unpack(y_pred), y_true):
-        if a == b:
-            if a == 1: tp += 1
-            if a == 0: tn += 1
-        if a != b:
-            false += 1
-            if a == 1: fp += 1
-            if a == 0: fn += 1
+    y_pos = K.round(K.clip(y_true, 0, 1))
+    y_neg = 1 - y_pos
 
-    numerator = (tp * tn) - (fp * fn)
-    denominator = np.sqrt((tp + fp) * (fp + fn) * (tn + fp) * (tn + fn))
-    mcc = numerator / denominator
+    tp = K.sum(y_pos * y_pred_pos)
+    tn = K.sum(y_neg * y_pred_neg)
 
-    return mcc
+    fp = K.sum(y_neg * y_pred_pos)
+    fn = K.sum(y_pos * y_pred_neg)
+
+    numerator = (tp * tn - fp * fn)
+    denominator = K.sqrt((tp + fp) * (tp + fn) * (tn + fp) * (tn + fn))
+
+    return numerator / (denominator + K.epsilon())
+
 
 class Classifier:
     def __init__(self,dictionary,word_vectors):
@@ -110,13 +101,13 @@ class Classifier:
                             weights=[self.embedding_matrix],
                             input_length=300,
                             trainable=True))
-        self.model.add(Conv1D(filters=200, kernel_size=3,
+        self.model.add(Conv1D(filters=100, kernel_size=3,
                          padding='same', activation='relu'))
         self.model.add(MaxPooling1D(pool_size=2))
-        self.model.add(Conv1D(filters=200, kernel_size=4,
+        self.model.add(Conv1D(filters=100, kernel_size=4,
                               padding='same', activation='relu'))
-        self.model.add(MaxPooling1D(pool_size=2))
-        self.model.add(Conv1D(filters=200, kernel_size=5,
+        self.model.add(MaxPooling1D(pool_size=3))
+        self.model.add(Conv1D(filters=100, kernel_size=5,
                               padding='same', activation='relu', kernel_regularizer=regularizers.l2(0.01)))
         self.model.add(MaxPooling1D(pool_size=2))
         self.model.add(Dropout(0.7))
@@ -131,7 +122,7 @@ class Classifier:
         tensorboard = TensorBoard(log_dir="logs/{}".format(time.time()))
         start = time.time()
         self.model.fit(x_training, y_training, epochs=5, batch_size=64, verbose=1,validation_split=0.1,
-                       callbacks=[tensorboard,metrics])
+                       callbacks=[tensorboard,metrics],class_weight={0:1.,1:1.})
         time_elapsed = time.time() - start
         print("Model fit in ", ("%.2f" % time_elapsed), "seconds")
 
