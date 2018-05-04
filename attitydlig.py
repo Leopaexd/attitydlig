@@ -20,6 +20,10 @@ def main():
 
     directory = 'C:\\Users\\olive\\Desktop\\Datasets_for_thesis\\Prisjakt\\training_data'
 
+    #input_file = open('nya_reviews.txt', 'r')
+    #review_translator.translate_file(input_file)
+    #input_file.close()
+
     extracted_data = extractor.json_extract(directory)
     extracted_reviews = extracted_data[0]
     polarities = extracted_data[1]
@@ -28,6 +32,7 @@ def main():
 
 
     # review_translator.translate_reviews(preprocessed_reviews, polarities)
+
 
     dictionary = dict.Dictionary(preprocessed_reviews).dictionary
 

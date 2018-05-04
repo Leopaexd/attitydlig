@@ -42,4 +42,15 @@ def translate_reviews(swedish_reviews, polarities):
     review_file.close()
     polarity_file.close()
 
+def translate_file(input_file):
+    i = 0
+    translator = translate.Client.from_service_account_json('uhtest-6fcb7b6b568d.json')
+    output_file = open ('new_translated.txt', 'w', encoding='utf-8')
+    for line in input_file:
+        i += 1
+        output_file.write(translator.translate(line, source_language='sv')['translatedText']+'\n')
+        print('Translated review ' + str(i))
+    output_file.close()
+    input_file.close()
+    return
 
