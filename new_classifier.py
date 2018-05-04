@@ -64,7 +64,7 @@ def matthews_correlation(y_true, y_pred):
     numerator = (tp * tn - fp * fn)
     denominator = K.sqrt((tp + fp) * (tp + fn) * (tn + fp) * (tn + fn))
 
-    return numerator / (denominator + K.epsilon())
+    return numerator / (denominator ) #+ K.epsilon()
 
 class Classifier:
     def __init__(self,dictionary,word_vectors):
@@ -128,7 +128,6 @@ class Classifier:
         fn = 0
         tp = 0
         tn = 0
-        print('pos: ' + str(pos) + '/' + str(total) + ' = ' + str(pos / total))
         for a, b in zip(np.around(self.model.predict(x_testing)), y_testing):
             if a == b:
                 if a == 1: tp += 1
@@ -140,6 +139,7 @@ class Classifier:
 
         print('false: ' + str(false) + '/' + str(total) + ' = ' + str(false / total))
         print('false positives: ' + str(fp) + ' false negatives: ' + str(fn))
+        print('true positives: ' + str(tp) + ' true negatives: ' + str(tn))
         print('Accuracy: ' + str((total - false) / total) + '. ' + str(total - false) + '/' + str(total) + ' hits')
         print('x_testing: ' + str(len(x_testing)) + ' y_testing: ' + str(len(y_testing)))
         numerator = (tp * tn) - (fp * fn)
