@@ -79,7 +79,7 @@ def matthews_correlation(y_true, y_pred):
     numerator = (tp * tn - fp * fn)
     denominator = K.sqrt((tp + fp) * (tp + fn) * (tn + fp) * (tn + fn))
 
-    return numerator / (denominator + K.epsilon())
+    return numerator / (denominator ) # +K.epsilon()
 
 
 class Classifier:
@@ -115,7 +115,7 @@ class Classifier:
         self.model.add(Dense(units=250, activation='relu'))
         self.model.add(Dense(units=1, activation='sigmoid'))
         self.model.compile(loss='binary_crossentropy', optimizer='adadelta',
-                      metrics=['binary_accuracy', f1,f1])
+                      metrics=['binary_accuracy', f1,f1,matthews_correlation])
 
 
     def fit(self, x_training, y_training):
@@ -155,11 +155,12 @@ class Classifier:
 
         print('false: ' + str(false) + '/' + str(total) + ' = ' + str(false / total))
         print('false positives: ' + str(fp) + ' false negatives: ' + str(fn))
-        print('Accuracy: ' + str((total-false)/total) + '. ' + str(total-false) + '/' + str(total) + ' hits')
-        print('x_testing: ' +str(len(x_testing)) + ' y_testing: ' + str(len(y_testing)))
-        numerator = (tp*tn)-(fp*fn)
-        denominator = np.sqrt((tp+fp)*(fp+fn)*(tn+fp)*(tn+fn))
-        mcc = numerator/denominator
+        print('true positives: ' + str(tp) + ' true negatives: ' + str(tn))
+        print('Accuracy: ' + str((total - false) / total) + '. ' + str(total - false) + '/' + str(total) + ' hits')
+        print('x_testing: ' + str(len(x_testing)) + ' y_testing: ' + str(len(y_testing)))
+        numerator = (tp * tn) - (fp * fn)
+        denominator = np.sqrt((tp + fp) * (fp + fn) * (tn + fp) * (tn + fn))
+        mcc = numerator / denominator
         print('Manual mcc = ' + str(mcc))
 
         loss_and_metrics = self.model.evaluate(x_testing, np.array(y_testing), batch_size=128, verbose=1)

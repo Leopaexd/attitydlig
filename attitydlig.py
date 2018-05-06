@@ -46,10 +46,10 @@ def main():
     print('pos: ' + str(pos) + '/' + str(tot) + ' = ' + str(pos / tot))
 
     # Translated data
-    with open('translated_reviews validation combined.txt', 'r') as file:
+    with open('new_translated.txt', 'r') as file:
         translated_reviews = np.concatenate(
             vectorizer.vectorize_data(preprocessor.preprocess(file.readlines()), dictionary, 300))
-    with open('translated_polarities validation combined.txt', 'r') as file:
+    with open('nya_polarities.txt', 'r') as file:
         translated_polarities = []
         for line in file:
             translated_polarities.append(int(line))
