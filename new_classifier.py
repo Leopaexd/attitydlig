@@ -74,6 +74,7 @@ class Classifier:
                 word_vector = word_vectors[word]
             except KeyError:
                 word_vector = None
+                print('Word not found: ' + str(word))
             if word_vector is not None:
                 self.embedding_matrix[index] = word_vector
 
@@ -105,7 +106,7 @@ class Classifier:
     def fit(self, x_training, y_training):
         tensorboard = TensorBoard(log_dir="logs/{}".format(time.time()))
         start = time.time()
-        self.model.fit(x_training, y_training, epochs=5, batch_size=64, verbose=1,validation_split=0.1,
+        self.model.fit(x_training, y_training, epochs=5, batch_size=64, verbose=1,validation_split=0.001,
                        callbacks=[tensorboard,metrics],class_weight={0:1.,1:1.})
         time_elapsed = time.time() - start
         print("Model fit in ", ("%.2f" % time_elapsed), "seconds")

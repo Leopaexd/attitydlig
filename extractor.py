@@ -26,16 +26,17 @@ def json_extract(directory):
             print('Extracting reviews from ' + file)
             loaded_file = json.load(open(os.path.join(root, file),'r'))
             for review in loaded_file:
-                polarity = review['grade']
-                text = review['comment']
-                if int(polarity) < 5:
-                    polarities.append(0)
-                    reviews.append(text)
-                elif int(polarity) > 7:
-                    if random.randint(1, 1) == 1:  # get 1/4 of positive reviews to balance
-                        polarities.append(1)
+                if random.randint(1,4) <= 3:
+                    polarity = review['grade']
+                    text = review['comment']
+                    if int(polarity) < 5:
+                        polarities.append(0)
                         reviews.append(text)
-                else:
-                    pass # ignore neutral polarities
+                    elif int(polarity) > 7:
+                        if random.randint(1, 4) == 1:  # get 1/4 of positive reviews to balance
+                            polarities.append(1)
+                            reviews.append(text)
+                    else:
+                        pass # ignore neutral polarities
 
     return [reviews, polarities]
