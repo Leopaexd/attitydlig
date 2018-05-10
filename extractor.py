@@ -4,6 +4,7 @@
 
 import os
 import xml.etree.ElementTree as ET
+import random
 
 # Extract reviews from files in directory and return them in a list.
 def extract(directory):
@@ -26,13 +27,14 @@ def xml_extract(directory):
             try:
              tree = ET.parse(os.path.join(root, file))
              for sentence in tree.getroot().findall('sentence'):
-                 polarity = sentence.find('polarity').text
-                 text = sentence.find('text').text
-                 reviews.append(text.lower())
-                 if polarity.upper() == 'POSITIVE':
-                     polarities.append(1)
-                 else:
-                     polarities.append(0)
+                 if random.randint(1, 247) <= 1:
+                    polarity = sentence.find('polarity').text
+                    text = sentence.find('text').text
+                    reviews.append(text.lower())
+                    if polarity.upper() == 'POSITIVE':
+                        polarities.append(1)
+                    else:
+                        polarities.append(0)
             except ET.ParseError:
                 pass
 
